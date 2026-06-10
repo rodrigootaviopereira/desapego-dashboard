@@ -1,0 +1,30 @@
+migrate(
+  (app) => {
+    const col = app.findCollectionByNameOrId('inventory_items')
+    col.fields.add(new TextField({ name: 'current_step' }))
+    col.fields.add(new JSONField({ name: 'step_history' }))
+    col.fields.add(new DateField({ name: 'venda_data' }))
+    col.fields.add(new TextField({ name: 'venda_plataforma' }))
+    col.fields.add(new NumberField({ name: 'venda_valor' }))
+    col.fields.add(new TextField({ name: 'comprador_nome' }))
+    col.fields.add(new TextField({ name: 'comprador_contato' }))
+    col.fields.add(new DateField({ name: 'doacao_data' }))
+    col.fields.add(new TextField({ name: 'donatario_nome' }))
+    col.fields.add(new TextField({ name: 'local_doacao' }))
+    app.save(col)
+  },
+  (app) => {
+    const col = app.findCollectionByNameOrId('inventory_items')
+    col.fields.removeByName('current_step')
+    col.fields.removeByName('step_history')
+    col.fields.removeByName('venda_data')
+    col.fields.removeByName('venda_plataforma')
+    col.fields.removeByName('venda_valor')
+    col.fields.removeByName('comprador_nome')
+    col.fields.removeByName('comprador_contato')
+    col.fields.removeByName('doacao_data')
+    col.fields.removeByName('donatario_nome')
+    col.fields.removeByName('local_doacao')
+    app.save(col)
+  },
+)

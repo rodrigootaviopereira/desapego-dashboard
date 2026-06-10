@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Menu } from 'lucide-react'
+import { Menu, Sun, Moon } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/use-auth'
+import { useTheme } from 'next-themes'
 
 const navLinks = [
   { label: 'Dashboard', path: '/' },
@@ -15,7 +16,8 @@ const navLinks = [
 
 export function Header() {
   const location = useLocation()
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth() as any
+  const { theme, setTheme } = useTheme()
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 w-full border-b border-border/10 md:pl-24">
@@ -60,13 +62,24 @@ export function Header() {
       </nav>
 
       {/* User Profile */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        </Button>
         <div className="text-right hidden sm:block">
           <p className="text-sm font-semibold text-foreground leading-none">
             {user?.name || 'Admin'}
           </p>
           <button
-            onClick={logout}
+            onClick={() => {
+              if (logout) logout()
+            }}
             className="text-xs text-muted-foreground hover:text-red-500 transition-colors mt-1 font-medium"
           >
             Sair (Logout)

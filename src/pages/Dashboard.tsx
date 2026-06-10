@@ -7,6 +7,7 @@ import {
   Package,
   CheckCircle,
   Clock,
+  TrendingUp,
 } from 'lucide-react'
 import {
   Bar,
@@ -51,6 +52,9 @@ export default function Dashboard() {
     (acc, curr) => acc + (curr.imagined_price || 0),
     0,
   )
+  const totalFaturado = items
+    .filter((i) => i.status === 'vendido')
+    .reduce((acc, curr) => acc + (curr.venda_valor || 0), 0)
 
   const categories = [
     'Gibis',
@@ -77,7 +81,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
           <div className="p-3 bg-blue-500/10 text-blue-500 rounded-lg group-hover:scale-110 transition-transform">
             <ClipboardList className="w-6 h-6" />
@@ -146,6 +150,22 @@ export default function Dashboard() {
           <h3 className="text-2xl font-bold text-primary">
             R${' '}
             {totalValue.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </h3>
+        </div>
+
+        <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
+          <div className="p-3 bg-emerald-500/10 text-emerald-500 rounded-lg group-hover:scale-110 transition-transform">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">
+            Valor Total Faturado
+          </p>
+          <h3 className="text-2xl font-bold text-emerald-500">
+            R${' '}
+            {totalFaturado.toLocaleString('pt-BR', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

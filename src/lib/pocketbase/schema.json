@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T16:58:17.307Z",
+  "generatedAt": "2026-06-10T17:40:14.083Z",
   "collections": [
     {
       "name": "users",
@@ -170,6 +170,66 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "current_step",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "step_history",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_data",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_plataforma",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "venda_valor",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprador_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comprador_contato",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "doacao_data",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "donatario_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "local_doacao",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": []
@@ -412,6 +472,177 @@
         }
       ],
       "indexes": []
+    },
+    {
+      "name": "logs",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "timestamp",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "agente",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "acao",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "item_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "inventory_items"
+        },
+        {
+          "name": "item_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "detalhes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "usuario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "campo_alterado",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_antes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "valor_depois",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "agentes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "slug",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "nome",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "persona",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "role_description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comportamentos",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "vocabulario",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tom",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "instrucoes_especiais",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_agentes_slug ON agentes (slug)"]
     }
   ]
 }

@@ -12,6 +12,9 @@ import Recommendations from './pages/Recommendations'
 import SalesAds from './pages/SalesAds'
 import Tips from './pages/Tips'
 import ComingSoon from './pages/ComingSoon'
+import Workflow from './pages/Workflow'
+import Logs from './pages/Logs'
+import Config from './pages/Config'
 
 const App = () => (
   <BrowserRouter
@@ -30,9 +33,9 @@ const App = () => (
               <Route path="/recomendacoes" element={<Recommendations />} />
               <Route path="/anuncios" element={<SalesAds />} />
               <Route path="/dicas" element={<Tips />} />
-              <Route path="/fluxo" element={<ComingSoon />} />
-              <Route path="/logs" element={<ComingSoon />} />
-              <Route path="/configuracao" element={<ComingSoon />} />
+              <Route path="/fluxo" element={<Workflow />} />
+              <Route path="/logs" element={<Logs />} />
+              <Route path="/configuracao" element={<Config />} />
               <Route path="*" element={<Dashboard />} />
             </Route>
           </Routes>

@@ -75,16 +75,9 @@ export function Sidebar() {
       <div className="mt-auto pt-4 px-4 border-t border-border/50 w-full flex flex-col gap-2">
         <Button
           variant="ghost"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
-        >
-          <Sun className="h-5 w-5 mr-3 flex-shrink-0 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 mr-3 flex-shrink-0 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="truncate">Tema</span>
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => logout()}
+          onClick={() => {
+            if (typeof logout === 'function') logout()
+          }}
           className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors"
         >
           <LogOut className="h-5 w-5 mr-3 flex-shrink-0" />
