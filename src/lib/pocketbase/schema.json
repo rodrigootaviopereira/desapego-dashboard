@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-06-10T21:22:49.766Z",
+  "generatedAt": "2026-06-10T22:36:39.674Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
+        "list": "",
+        "view": "",
         "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "update": "",
+        "delete": ""
       },
       "fields": [
         {
@@ -53,11 +53,11 @@
       "name": "inventory_items",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != ''",
-        "view": "@request.auth.id != ''",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {
