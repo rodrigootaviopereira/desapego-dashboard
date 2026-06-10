@@ -8,6 +8,9 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Inventory from './pages/Inventory'
+import Recommendations from './pages/Recommendations'
+import SalesAds from './pages/SalesAds'
+import Tips from './pages/Tips'
 import ComingSoon from './pages/ComingSoon'
 
 const App = () => (
@@ -24,9 +27,9 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/inventario" element={<Inventory />} />
-              <Route path="/recomendacoes" element={<ComingSoon />} />
-              <Route path="/anuncios" element={<ComingSoon />} />
-              <Route path="/dicas" element={<ComingSoon />} />
+              <Route path="/recomendacoes" element={<Recommendations />} />
+              <Route path="/anuncios" element={<SalesAds />} />
+              <Route path="/dicas" element={<Tips />} />
               <Route path="/fluxo" element={<ComingSoon />} />
               <Route path="/logs" element={<ComingSoon />} />
               <Route path="/configuracao" element={<ComingSoon />} />

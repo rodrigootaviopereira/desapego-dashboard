@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T15:43:15.500Z",
+  "generatedAt": "2026-06-10T16:58:17.307Z",
   "collections": [
     {
       "name": "users",
@@ -156,6 +156,245 @@
           "required": false,
           "system": false,
           "selectValues": ["disponivel", "reservado", "vendido", "doado"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "recomendacoes",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "item_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "inventory_items"
+        },
+        {
+          "name": "item_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "plataforma",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ancora",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "alvo",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "piso",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "justificativa_max",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notas_estrategista",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "prompts_venda",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "item_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "inventory_items"
+        },
+        {
+          "name": "item_nome",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "descricao",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "fotos",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["rascunho", "publicado", "arquivado"]
+        },
+        {
+          "name": "agente_leo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notas_copywriter",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "data",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "dicas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "agente",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Vera", "Leo", "Max", "Kai"]
+        },
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "texto",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "item_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "inventory_items"
+        },
+        {
+          "name": "data",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "aplicada",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resultado",
+          "type": "text",
+          "required": false,
+          "system": false
         },
         {
           "name": "created",

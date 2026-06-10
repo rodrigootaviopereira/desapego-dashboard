@@ -34,7 +34,7 @@ export function Sidebar() {
   const { logout } = useAuth()
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 py-6 bg-card border-r border-border/50 h-screen fixed left-0 top-0 z-40 transition-colors duration-300 shadow-sm">
+    <aside className="hidden lg:flex flex-col w-72 py-6 bg-card border-r border-border/50 h-screen fixed left-0 top-0 z-40 transition-colors duration-300 shadow-sm">
       <div className="mb-8 px-6 flex items-center gap-3">
         <Link
           to="/"
