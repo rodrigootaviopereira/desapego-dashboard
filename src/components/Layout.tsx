@@ -1,8 +1,15 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function Layout() {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
       <Sidebar />

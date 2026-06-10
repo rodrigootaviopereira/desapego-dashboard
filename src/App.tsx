@@ -3,13 +3,12 @@ import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/hooks/use-auth'
 import Layout from './components/Layout'
-import Index from './pages/Index'
-import Reports from './pages/Reports'
-import Cryptocurrency from './pages/Cryptocurrency'
-import Exchange from './pages/Exchange'
-import Community from './pages/Community'
-import NotFound from './pages/NotFound'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Inventory from './pages/Inventory'
+import ComingSoon from './pages/ComingSoon'
 
 const App = () => (
   <BrowserRouter
@@ -17,18 +16,24 @@ const App = () => (
   >
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/cryptocurrency" element={<Cryptocurrency />} />
-            <Route path="/exchange" element={<Exchange />} />
-            <Route path="/community" element={<Community />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/inventario" element={<Inventory />} />
+              <Route path="/recomendacoes" element={<ComingSoon />} />
+              <Route path="/anuncios" element={<ComingSoon />} />
+              <Route path="/dicas" element={<ComingSoon />} />
+              <Route path="/fluxo" element={<ComingSoon />} />
+              <Route path="/logs" element={<ComingSoon />} />
+              <Route path="/configuracao" element={<ComingSoon />} />
+              <Route path="*" element={<Dashboard />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
   </BrowserRouter>

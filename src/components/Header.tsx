@@ -1,20 +1,21 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Menu } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/use-auth'
 
 const navLinks = [
   { label: 'Dashboard', path: '/' },
-  { label: 'Reports', path: '/reports' },
-  { label: 'Cryptocurrency', path: '/cryptocurrency' },
-  { label: 'Exchange', path: '/exchange' },
-  { label: 'Community', path: '/community' },
+  { label: 'Inventário', path: '/inventario' },
+  { label: 'Recomendações', path: '/recomendacoes' },
+  { label: 'Anúncios', path: '/anuncios' },
 ]
 
 export function Header() {
   const location = useLocation()
+  const { user, logout } = useAuth()
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 w-full border-b border-border/10 md:pl-24">
@@ -50,44 +51,31 @@ export function Header() {
         </Sheet>
       </div>
 
-      {/* Desktop Navigation */}
+      {/* Desktop Navigation - Simplified to show context only, since sidebar is main nav */}
       <nav className="hidden md:flex items-center gap-8">
-        {navLinks.map((link) => {
-          const isActive = location.pathname === link.path
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={cn(
-                'relative text-sm font-medium transition-colors hover:text-foreground py-2',
-                isActive ? 'text-foreground' : 'text-muted-foreground',
-              )}
-            >
-              {link.label}
-              {isActive && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
-              )}
-            </Link>
-          )
-        })}
+        <h2 className="text-sm font-medium text-muted-foreground tracking-wide uppercase">
+          {navLinks.find((l) => l.path === location.pathname)?.label ||
+            'Painel Administrativo'}
+        </h2>
       </nav>
 
       {/* User Profile */}
-      <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+      <div className="flex items-center gap-3">
         <div className="text-right hidden sm:block">
           <p className="text-sm font-semibold text-foreground leading-none">
-            Ilona Smliduet
+            {user?.name || 'Admin'}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            ilondut46@gmail.com
-          </p>
+          <button
+            onClick={logout}
+            className="text-xs text-muted-foreground hover:text-red-500 transition-colors mt-1 font-medium"
+          >
+            Sair (Logout)
+          </button>
         </div>
-        <Avatar className="h-10 w-10 border border-border">
-          <AvatarImage
-            src="https://img.usecurling.com/ppl/medium?gender=female"
-            alt="Ilona Smliduet"
-          />
-          <AvatarFallback>IS</AvatarFallback>
+        <Avatar className="h-10 w-10 border border-border ring-2 ring-primary/20">
+          <AvatarFallback className="bg-primary/10 text-primary font-bold">
+            DS
+          </AvatarFallback>
         </Avatar>
       </div>
     </header>
