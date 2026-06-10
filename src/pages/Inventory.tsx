@@ -1,54 +1,91 @@
-import { useState, useMemo } from 'react'
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Plus, Search, Edit2, Trash2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { MOCK_INVENTORY, Item } from '@/lib/mock-data'
 import { InventoryForm } from '@/components/inventory/InventoryForm'
+import { BulkImportDialog } from '@/components/inventory/BulkImportDialog'
 import { cn } from '@/lib/utils'
+import {
+  getInventoryItems,
+  createInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+  InventoryItem,
+} from '@/services/inventory'
+import { useRealtime } from '@/hooks/use-realtime'
+import { toast } from 'sonner'
 
 export default function Inventory() {
-  const [items, setItems] = useState<Item[]>(MOCK_INVENTORY)
+  const [items, setItems] = useState<InventoryItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterCategory, setFilterCategory] = useState('All')
   const [filterStatus, setFilterStatus] = useState('All')
   const [filterPriority, setFilterPriority] = useState('All')
 
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<Item | null>(null)
+  const [isBulkOpen, setIsBulkOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
 
-  const handleOpenForm = (item?: Item) => {
+  const loadData = async () => {
+    try {
+      const data = await getInventoryItems()
+      setItems(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+  useRealtime('inventory_items', () => {
+    loadData()
+  })
+
+  const handleOpenForm = (item?: InventoryItem) => {
     setEditingItem(item || null)
     setIsFormOpen(true)
   }
 
-  const handleSaveForm = (savedItem: Item) => {
-    if (editingItem) {
-      setItems(items.map((i) => (i.id === savedItem.id ? savedItem : i)))
-    } else {
-      setItems([savedItem, ...items])
+  const handleSaveForm = async (savedItem: Partial<InventoryItem>) => {
+    try {
+      if (editingItem && savedItem.id) {
+        await updateInventoryItem(savedItem.id, savedItem)
+        toast.success('Item atualizado com sucesso!')
+      } else {
+        await createInventoryItem(savedItem)
+        toast.success('Item criado com sucesso!')
+      }
+      setIsFormOpen(false)
+    } catch (e) {
+      toast.error('Erro ao salvar item')
     }
-    setIsFormOpen(false)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja deletar este item?')) {
-      setItems(items.filter((i) => i.id !== id))
+      try {
+        await deleteInventoryItem(id)
+        toast.success('Item deletado com sucesso!')
+      } catch (e) {
+        toast.error('Erro ao deletar item')
+      }
     }
   }
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const matchSearch = item.nome
+      const matchSearch = item.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
       const matchCategory =
-        filterCategory === 'All' || item.categoria === filterCategory
+        filterCategory === 'All' || item.category === filterCategory
       const matchStatus = filterStatus === 'All' || item.status === filterStatus
 
       let matchPriority = true
-      if (filterPriority === 'Alta') matchPriority = item.score >= 8
+      if (filterPriority === 'Alta') matchPriority = item.priority_score >= 8
       if (filterPriority === 'Media')
-        matchPriority = item.score >= 5 && item.score < 8
-      if (filterPriority === 'Baixa') matchPriority = item.score < 5
+        matchPriority = item.priority_score >= 5 && item.priority_score < 8
+      if (filterPriority === 'Baixa') matchPriority = item.priority_score < 5
 
       return matchSearch && matchCategory && matchStatus && matchPriority
     })
@@ -63,13 +100,23 @@ export default function Inventory() {
             Gerencie todos os itens do Desapego Squad.
           </p>
         </div>
-        <Button
-          onClick={() => handleOpenForm()}
-          className="w-full sm:w-auto h-10 shadow-sm"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Item
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsBulkOpen(true)}
+            className="flex-1 sm:flex-none h-10 shadow-sm"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Importar
+          </Button>
+          <Button
+            onClick={() => handleOpenForm()}
+            className="flex-1 sm:flex-none h-10 shadow-sm"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Item
+          </Button>
+        </div>
       </div>
 
       <div className="bg-card border border-border/50 rounded-xl shadow-sm p-4 space-y-4">
@@ -102,12 +149,13 @@ export default function Inventory() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 capitalize"
           >
             <option value="All">Todos Status</option>
-            <option value="Disponível">Disponível</option>
-            <option value="Reservado">Reservado</option>
-            <option value="Vendido">Vendido</option>
+            <option value="disponivel">Disponível</option>
+            <option value="reservado">Reservado</option>
+            <option value="vendido">Vendido</option>
+            <option value="doado">Doado</option>
           </select>
 
           <select
@@ -139,9 +187,9 @@ export default function Inventory() {
             </thead>
             <tbody>
               {filteredItems.map((item) => {
-                const isHighPriority = item.score >= 8
-                const isAvailable = item.status === 'Disponível'
-                const destino = item.preco > 0 ? 'Venda' : 'Doação'
+                const isHighPriority = item.priority_score >= 8
+                const isAvailable = item.status === 'disponivel'
+                const destino = item.imagined_price > 0 ? 'Venda' : 'Doação'
 
                 return (
                   <tr
@@ -150,15 +198,15 @@ export default function Inventory() {
                   >
                     <td
                       className="px-4 py-3 font-medium text-foreground max-w-[200px] truncate"
-                      title={item.nome}
+                      title={item.name}
                     >
-                      {item.nome}
+                      {item.name}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {item.categoria}
+                      {item.category}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {item.estado}
+                      {item.condition}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -173,12 +221,15 @@ export default function Inventory() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
-                      R$ {item.preco.toFixed(2)}
+                      R${' '}
+                      {item.imagined_price.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                      })}
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className={cn(
-                          'px-2 py-1 rounded-md text-xs font-semibold shadow-sm inline-block',
+                          'px-2 py-1 rounded-md text-xs font-semibold shadow-sm inline-block capitalize',
                           isAvailable
                             ? 'bg-green-500 text-white'
                             : 'bg-secondary text-secondary-foreground',
@@ -196,7 +247,7 @@ export default function Inventory() {
                             : 'bg-muted text-muted-foreground',
                         )}
                       >
-                        {item.score}
+                        {item.priority_score}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right space-x-2">
@@ -244,6 +295,12 @@ export default function Inventory() {
         onClose={() => setIsFormOpen(false)}
         onSave={handleSaveForm}
         initialData={editingItem}
+      />
+
+      <BulkImportDialog
+        isOpen={isBulkOpen}
+        onClose={() => setIsBulkOpen(false)}
+        onImportDone={loadData}
       />
     </div>
   )

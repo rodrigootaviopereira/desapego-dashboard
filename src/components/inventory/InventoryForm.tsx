@@ -1,30 +1,31 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Item } from '@/lib/mock-data'
+import { InventoryItem } from '@/services/inventory'
 
 interface InventoryFormProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (item: Item) => void
-  initialData?: Item | null
+  onSave: (item: Partial<InventoryItem>) => void
+  initialData?: InventoryItem | null
 }
 
-const defaultItem: Partial<Item> = {
-  nome: '',
-  categoria: 'Gibis',
-  marcaModelo: '',
-  estado: 'Novo',
-  funciona: 'Sim',
-  defeitos: '',
-  acessorios: '',
-  cidade: '',
-  aceitaEnvio: 'Sim',
-  preco: 0,
-  urgencia: 'Média',
-  observacoes: '',
-  status: 'Disponível',
-  score: 5,
+const defaultItem: Partial<InventoryItem> = {
+  name: '',
+  category: 'Gibis',
+  brand: '',
+  model: '',
+  condition: 'Novo',
+  functional_status: 'Sim',
+  defects: '',
+  accessories: '',
+  city: '',
+  accepts_shipping: 'Sim',
+  imagined_price: 0,
+  urgency: 'Média',
+  observations: '',
+  status: 'disponivel',
+  priority_score: 5,
 }
 
 export function InventoryForm({
@@ -33,7 +34,7 @@ export function InventoryForm({
   onSave,
   initialData,
 }: InventoryFormProps) {
-  const [formData, setFormData] = useState<Partial<Item>>(defaultItem)
+  const [formData, setFormData] = useState<Partial<InventoryItem>>(defaultItem)
 
   useEffect(() => {
     if (isOpen) {
@@ -51,16 +52,16 @@ export function InventoryForm({
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'preco' || name === 'score' ? Number(value) : value,
+      [name]:
+        name === 'imagined_price' || name === 'priority_score'
+          ? Number(value)
+          : value,
     }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave({
-      ...formData,
-      id: formData.id || `item-${Date.now()}`,
-    } as Item)
+    onSave(formData)
   }
 
   return (
@@ -90,8 +91,8 @@ export function InventoryForm({
               <label className="text-sm font-medium">Nome *</label>
               <input
                 required
-                name="nome"
-                value={formData.nome}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
@@ -100,8 +101,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Categoria</label>
               <select
-                name="categoria"
-                value={formData.categoria}
+                name="category"
+                value={formData.category}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
@@ -114,10 +115,20 @@ export function InventoryForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Marca ou Modelo</label>
+              <label className="text-sm font-medium">Marca</label>
               <input
-                name="marcaModelo"
-                value={formData.marcaModelo}
+                name="brand"
+                value={formData.brand}
+                onChange={handleChange}
+                className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Modelo</label>
+              <input
+                name="model"
+                value={formData.model}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               />
@@ -126,8 +137,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Estado</label>
               <select
-                name="estado"
-                value={formData.estado}
+                name="condition"
+                value={formData.condition}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               >
@@ -142,8 +153,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Funciona?</label>
               <select
-                name="funciona"
-                value={formData.funciona}
+                name="functional_status"
+                value={formData.functional_status}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               >
@@ -157,8 +168,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Aceita Envio?</label>
               <select
-                name="aceitaEnvio"
-                value={formData.aceitaEnvio}
+                name="accepts_shipping"
+                value={formData.accepts_shipping}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               >
@@ -171,8 +182,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Cidade</label>
               <input
-                name="cidade"
-                value={formData.cidade}
+                name="city"
+                value={formData.city}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               />
@@ -186,8 +197,8 @@ export function InventoryForm({
                 type="number"
                 min="0"
                 step="0.01"
-                name="preco"
-                value={formData.preco}
+                name="imagined_price"
+                value={formData.imagined_price}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               />
@@ -196,8 +207,8 @@ export function InventoryForm({
             <div className="space-y-2">
               <label className="text-sm font-medium">Urgência</label>
               <select
-                name="urgencia"
-                value={formData.urgencia}
+                name="urgency"
+                value={formData.urgency}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               >
@@ -208,15 +219,30 @@ export function InventoryForm({
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
+              >
+                <option value="disponivel">Disponível</option>
+                <option value="reservado">Reservado</option>
+                <option value="vendido">Vendido</option>
+                <option value="doado">Doado</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium">
                 Score (Prioridade 1-10)
               </label>
               <input
                 type="number"
                 min="1"
-                max="11"
-                name="score"
-                value={formData.score}
+                max="10"
+                name="priority_score"
+                value={formData.priority_score}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
               />
@@ -225,9 +251,9 @@ export function InventoryForm({
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium">Defeitos</label>
               <textarea
-                name="defeitos"
+                name="defects"
                 rows={2}
-                value={formData.defeitos}
+                value={formData.defects}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm resize-none"
               />
@@ -236,9 +262,9 @@ export function InventoryForm({
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium">Acessórios</label>
               <textarea
-                name="acessorios"
+                name="accessories"
                 rows={2}
-                value={formData.acessorios}
+                value={formData.accessories}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm resize-none"
               />
@@ -247,9 +273,9 @@ export function InventoryForm({
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium">Observações</label>
               <textarea
-                name="observacoes"
+                name="observations"
                 rows={2}
-                value={formData.observacoes}
+                value={formData.observations}
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm resize-none"
               />
@@ -258,7 +284,7 @@ export function InventoryForm({
         </div>
 
         <div className="p-6 border-t border-border/50 flex justify-end gap-3 bg-muted/20">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} type="button">
             Cancelar
           </Button>
           <Button type="submit" form="inventory-form">

@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-06-10T15:43:15.500Z",
+  "collections": [
+    {
+      "name": "users",
+      "type": "auth",
+      "apiRules": {
+        "list": "id = @request.auth.id",
+        "view": "id = @request.auth.id",
+        "create": "",
+        "update": "id = @request.auth.id",
+        "delete": "id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "avatar",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+      ]
+    },
+    {
+      "name": "inventory_items",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "Gibis",
+            "Eletrônicos",
+            "Instrumentos",
+            "Livros",
+            "Outros"
+          ]
+        },
+        {
+          "name": "brand",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "condition",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Novo", "Como novo", "Bom", "Regular", "Ruim"]
+        },
+        {
+          "name": "functional_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Sim", "Não", "Parcialmente", "N/A"]
+        },
+        {
+          "name": "defects",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "accessories",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "accepts_shipping",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Sim", "Não", "Só local"]
+        },
+        {
+          "name": "imagined_price",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "urgency",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["Baixa", "Média", "Alta"]
+        },
+        {
+          "name": "observations",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "priority_score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["disponivel", "reservado", "vendido", "doado"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}

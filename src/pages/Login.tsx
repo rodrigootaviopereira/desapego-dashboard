@@ -8,14 +8,17 @@ export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = login(username, password)
+    setIsLoading(true)
+    const success = await login(username, password)
+    setIsLoading(false)
     if (!success) setError(true)
   }
 
@@ -35,7 +38,7 @@ export default function Login() {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">
-              Usuário
+              Usuário ou E-mail
             </label>
             <input
               type="text"
@@ -44,6 +47,7 @@ export default function Login() {
               className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
               placeholder="Digite seu usuário"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -58,6 +62,7 @@ export default function Login() {
               className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
               placeholder="Digite sua senha"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -67,8 +72,12 @@ export default function Login() {
             </p>
           )}
 
-          <Button type="submit" className="w-full h-11 text-base font-semibold">
-            Entrar
+          <Button
+            type="submit"
+            className="w-full h-11 text-base font-semibold"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
       </div>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Target,
   ClipboardList,
@@ -16,24 +17,57 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart'
-
-const chartData = [
-  { category: 'Gibis', count: 32 },
-  { category: 'Eletrônicos', count: 2 },
-  { category: 'Instrumentos', count: 0 },
-  { category: 'Livros', count: 0 },
-  { category: 'Outros', count: 0 },
-]
-
-const top5Items = [
-  { id: 1, name: 'PS Vita', score: 11, type: 'Eletrônicos' },
-  { id: 2, name: 'Sandman Vol I', score: 10, type: 'Gibis' },
-  { id: 3, name: 'Sandman Vol II', score: 10, type: 'Gibis' },
-  { id: 4, name: 'Sandman Vol III', score: 10, type: 'Gibis' },
-  { id: 5, name: 'Sandman Vol IV', score: 10, type: 'Gibis' },
-]
+import { getInventoryItems, InventoryItem } from '@/services/inventory'
+import { useRealtime } from '@/hooks/use-realtime'
 
 export default function Dashboard() {
+  const [items, setItems] = useState<InventoryItem[]>([])
+
+  const loadData = async () => {
+    try {
+      const data = await getInventoryItems()
+      setItems(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  useRealtime('inventory_items', () => {
+    loadData()
+  })
+
+  const totalItems = items.length
+  const available = items.filter((i) => i.status === 'disponivel').length
+  const reserved = items.filter((i) => i.status === 'reservado').length
+  const soldOrDonated = items.filter(
+    (i) => i.status === 'vendido' || i.status === 'doado',
+  ).length
+  const urgent = items.filter((i) => i.urgency === 'Alta').length
+  const totalValue = items.reduce(
+    (acc, curr) => acc + (curr.imagined_price || 0),
+    0,
+  )
+
+  const categories = [
+    'Gibis',
+    'Eletrônicos',
+    'Instrumentos',
+    'Livros',
+    'Outros',
+  ]
+  const chartData = categories.map((cat) => ({
+    category: cat,
+    count: items.filter((i) => i.category === cat).length,
+  }))
+
+  const top5Items = [...items]
+    .sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
+    .slice(0, 5)
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="flex flex-col gap-2">
@@ -43,8 +77,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
           <div className="p-3 bg-blue-500/10 text-blue-500 rounded-lg group-hover:scale-110 transition-transform">
             <ClipboardList className="w-6 h-6" />
@@ -52,7 +85,7 @@ export default function Dashboard() {
           <p className="text-sm font-medium text-muted-foreground">
             Total de Itens
           </p>
-          <h3 className="text-2xl font-bold">34</h3>
+          <h3 className="text-2xl font-bold">{totalItems}</h3>
         </div>
 
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
@@ -62,7 +95,7 @@ export default function Dashboard() {
           <p className="text-sm font-medium text-muted-foreground">
             Disponíveis
           </p>
-          <h3 className="text-2xl font-bold">34</h3>
+          <h3 className="text-2xl font-bold">{available}</h3>
         </div>
 
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
@@ -72,7 +105,7 @@ export default function Dashboard() {
           <p className="text-sm font-medium text-muted-foreground">
             Reservados
           </p>
-          <h3 className="text-2xl font-bold">0</h3>
+          <h3 className="text-2xl font-bold">{reserved}</h3>
         </div>
 
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors">
@@ -82,7 +115,7 @@ export default function Dashboard() {
           <p className="text-sm font-medium text-muted-foreground">
             Vendidos ou Doados
           </p>
-          <h3 className="text-2xl font-bold">0</h3>
+          <h3 className="text-2xl font-bold">{soldOrDonated}</h3>
         </div>
 
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col items-center text-center justify-center gap-2 group hover:border-primary/50 transition-colors relative overflow-hidden">
@@ -94,10 +127,12 @@ export default function Dashboard() {
             Itens Urgentes
           </p>
           <div className="flex items-center gap-2">
-            <h3 className="text-2xl font-bold">29</h3>
-            <span className="px-2 py-0.5 text-xs font-semibold bg-green-500 text-white rounded-full shadow-sm animate-pulse">
-              Ação Imediata
-            </span>
+            <h3 className="text-2xl font-bold">{urgent}</h3>
+            {urgent > 0 && (
+              <span className="px-2 py-0.5 text-xs font-semibold bg-green-500 text-white rounded-full shadow-sm animate-pulse">
+                Ação Imediata
+              </span>
+            )}
           </div>
         </div>
 
@@ -108,12 +143,17 @@ export default function Dashboard() {
           <p className="text-sm font-medium text-muted-foreground">
             Valor Total Estimado
           </p>
-          <h3 className="text-2xl font-bold text-primary">R$ 2.594</h3>
+          <h3 className="text-2xl font-bold text-primary">
+            R${' '}
+            {totalValue.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </h3>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Chart */}
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-6">
             <Package className="w-5 h-5 text-primary" />
@@ -157,7 +197,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Top 5 Table */}
         <div className="p-6 bg-card border border-border/50 rounded-xl shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-6">
             <Target className="w-5 h-5 text-primary" />
@@ -178,21 +217,34 @@ export default function Dashboard() {
                     key={item.id}
                     className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors"
                   >
-                    <td className="px-4 py-4 font-medium text-foreground">
+                    <td
+                      className="px-4 py-4 font-medium text-foreground max-w-[200px] truncate"
+                      title={item.name}
+                    >
                       {item.name}
                     </td>
                     <td className="px-4 py-4">
-                      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                        {item.type}
+                      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground whitespace-nowrap">
+                        {item.category}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right">
                       <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
-                        {item.score}
+                        {item.priority_score}
                       </span>
                     </td>
                   </tr>
                 ))}
+                {top5Items.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="px-4 py-8 text-center text-muted-foreground"
+                    >
+                      Nenhum item cadastrado.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
