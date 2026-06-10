@@ -15,6 +15,10 @@ import ComingSoon from './pages/ComingSoon'
 import Workflow from './pages/Workflow'
 import Logs from './pages/Logs'
 import Config from './pages/Config'
+import Reports from './pages/Reports'
+import ApiAdmin from './pages/ApiAdmin'
+import WebhooksAdmin from './pages/WebhooksAdmin'
+import ApiDocs from './pages/ApiDocs'
 
 const App = () => (
   <BrowserRouter
@@ -34,8 +38,12 @@ const App = () => (
               <Route path="/anuncios" element={<SalesAds />} />
               <Route path="/dicas" element={<Tips />} />
               <Route path="/fluxo" element={<Workflow />} />
+              <Route path="/relatorios" element={<Reports />} />
               <Route path="/logs" element={<Logs />} />
               <Route path="/configuracao" element={<Config />} />
+              <Route path="/admin/api" element={<ApiAdmin />} />
+              <Route path="/admin/webhooks" element={<WebhooksAdmin />} />
+              <Route path="/api/docs" element={<ApiDocs />} />
               <Route path="*" element={<Dashboard />} />
             </Route>
           </Routes>

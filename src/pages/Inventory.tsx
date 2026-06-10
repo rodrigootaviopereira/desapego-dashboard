@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Upload } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Upload, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { InventoryForm } from '@/components/inventory/InventoryForm'
 import { BulkImportDialog } from '@/components/inventory/BulkImportDialog'
@@ -8,7 +8,6 @@ import {
   getInventoryItems,
   createInventoryItem,
   updateInventoryItem,
-  deleteInventoryItem,
   InventoryItem,
 } from '@/services/inventory'
 import { useRealtime } from '@/hooks/use-realtime'
@@ -17,9 +16,9 @@ import { toast } from 'sonner'
 export default function Inventory() {
   const [items, setItems] = useState<InventoryItem[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterCategory, setFilterCategory] = useState('All')
-  const [filterStatus, setFilterStatus] = useState('All')
-  const [filterPriority, setFilterPriority] = useState('All')
+  const [quickFilter, setQuickFilter] = useState('Todos')
+  const [showDeleted, setShowDeleted] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isBulkOpen, setIsBulkOpen] = useState(false)
@@ -62,34 +61,85 @@ export default function Inventory() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja deletar este item?')) {
+    if (confirm('Tem certeza que deseja mover para a lixeira?')) {
       try {
-        await deleteInventoryItem(id)
-        toast.success('Item deletado com sucesso!')
+        await updateInventoryItem(id, { deletado: true })
+        toast.success('Item movido para a lixeira')
+        setSelectedIds((prev) => prev.filter((x) => x !== id))
       } catch (e) {
         toast.error('Erro ao deletar item')
       }
     }
   }
 
+  const handleRestore = async (id: string) => {
+    try {
+      await updateInventoryItem(id, { deletado: false })
+      toast.success('Item restaurado com sucesso')
+      setSelectedIds((prev) => prev.filter((x) => x !== id))
+    } catch (e) {
+      toast.error('Erro ao restaurar item')
+    }
+  }
+
+  const handleBulkAction = async (
+    action: 'delete' | 'restore' | 'urgent' | 'available',
+  ) => {
+    if (!confirm(`Confirmar ação em lote para ${selectedIds.length} itens?`))
+      return
+    try {
+      await Promise.all(
+        selectedIds.map((id) => {
+          if (action === 'delete')
+            return updateInventoryItem(id, { deletado: true })
+          if (action === 'restore')
+            return updateInventoryItem(id, { deletado: false })
+          if (action === 'urgent')
+            return updateInventoryItem(id, {
+              urgency: 'Alta',
+              priority_score: 9,
+            })
+          if (action === 'available')
+            return updateInventoryItem(id, { status: 'disponivel' })
+        }),
+      )
+      toast.success('Ação em lote realizada com sucesso')
+      setSelectedIds([])
+    } catch (e) {
+      toast.error('Erro ao executar ação em lote')
+    }
+  }
+
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
+      const matchDeleted = showDeleted ? item.deletado === true : !item.deletado
+      if (!matchDeleted) return false
+
       const matchSearch = item.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
-      const matchCategory =
-        filterCategory === 'All' || item.category === filterCategory
-      const matchStatus = filterStatus === 'All' || item.status === filterStatus
+      if (!matchSearch) return false
 
-      let matchPriority = true
-      if (filterPriority === 'Alta') matchPriority = item.priority_score >= 8
-      if (filterPriority === 'Media')
-        matchPriority = item.priority_score >= 5 && item.priority_score < 8
-      if (filterPriority === 'Baixa') matchPriority = item.priority_score < 5
+      if (quickFilter === 'Disponíveis') return item.status === 'disponivel'
+      if (quickFilter === 'Urgentes') return item.urgency === 'Alta'
+      if (quickFilter === 'Score 8+') return item.priority_score >= 8
+      if (quickFilter === 'Sem preço')
+        return item.imagined_price === 0 || !item.imagined_price
 
-      return matchSearch && matchCategory && matchStatus && matchPriority
+      return true
     })
-  }, [items, searchTerm, filterCategory, filterStatus, filterPriority])
+  }, [items, searchTerm, quickFilter, showDeleted])
+
+  const toggleAll = () => {
+    if (selectedIds.length === filteredItems.length) setSelectedIds([])
+    else setSelectedIds(filteredItems.map((i) => i.id))
+  }
+
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
 
   return (
     <div className="space-y-6 animate-fade-in pb-10">
@@ -120,9 +170,9 @@ export default function Inventory() {
       </div>
 
       <div className="bg-card border border-border/50 rounded-xl shadow-sm p-4 space-y-4">
-        {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="relative">
+        {/* Quick Filters */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
@@ -132,42 +182,29 @@ export default function Inventory() {
               className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
-
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          {['Todos', 'Disponíveis', 'Urgentes', 'Score 8+', 'Sem preço'].map(
+            (qf) => (
+              <Button
+                key={qf}
+                variant={quickFilter === qf ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setQuickFilter(qf)}
+              >
+                {qf}
+              </Button>
+            ),
+          )}
+          <div className="flex-1" />
+          <Button
+            variant={showDeleted ? 'destructive' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setShowDeleted(!showDeleted)
+              setSelectedIds([])
+            }}
           >
-            <option value="All">Todas Categorias</option>
-            <option value="Gibis">Gibis</option>
-            <option value="Eletrônicos">Eletrônicos</option>
-            <option value="Instrumentos">Instrumentos</option>
-            <option value="Livros">Livros</option>
-            <option value="Outros">Outros</option>
-          </select>
-
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 capitalize"
-          >
-            <option value="All">Todos Status</option>
-            <option value="disponivel">Disponível</option>
-            <option value="reservado">Reservado</option>
-            <option value="vendido">Vendido</option>
-            <option value="doado">Doado</option>
-          </select>
-
-          <select
-            value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value)}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-          >
-            <option value="All">Todas Prioridades</option>
-            <option value="Alta">Alta (Score 8+)</option>
-            <option value="Media">Média (Score 5-7)</option>
-            <option value="Baixa">Baixa (Score &lt; 5)</option>
-          </select>
+            {showDeleted ? 'Sair da Lixeira' : 'Ver Lixeira'}
+          </Button>
         </div>
 
         {/* Table */}
@@ -175,10 +212,19 @@ export default function Inventory() {
           <table className="w-full text-sm text-left whitespace-nowrap">
             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
               <tr>
+                <th className="px-4 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    className="rounded"
+                    onChange={toggleAll}
+                    checked={
+                      selectedIds.length === filteredItems.length &&
+                      filteredItems.length > 0
+                    }
+                  />
+                </th>
                 <th className="px-4 py-3">Nome</th>
                 <th className="px-4 py-3">Categoria</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Destino</th>
                 <th className="px-4 py-3 text-right">Preço</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3 text-center">Prioridade</th>
@@ -189,13 +235,20 @@ export default function Inventory() {
               {filteredItems.map((item) => {
                 const isHighPriority = item.priority_score >= 8
                 const isAvailable = item.status === 'disponivel'
-                const destino = item.imagined_price > 0 ? 'Venda' : 'Doação'
 
                 return (
                   <tr
                     key={item.id}
                     className="border-b border-border/50 hover:bg-muted/30 transition-colors"
                   >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={selectedIds.includes(item.id)}
+                        onChange={() => toggleOne(item.id)}
+                      />
+                    </td>
                     <td
                       className="px-4 py-3 font-medium text-foreground max-w-[200px] truncate"
                       title={item.name}
@@ -205,26 +258,13 @@ export default function Inventory() {
                     <td className="px-4 py-3 text-muted-foreground">
                       {item.category}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {item.condition}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={cn(
-                          'px-2 py-1 rounded-md text-xs font-medium',
-                          destino === 'Venda'
-                            ? 'bg-blue-500/10 text-blue-500'
-                            : 'bg-purple-500/10 text-purple-500',
-                        )}
-                      >
-                        {destino}
-                      </span>
-                    </td>
                     <td className="px-4 py-3 text-right font-medium">
                       R${' '}
-                      {item.imagined_price.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                      })}
+                      {item.imagined_price
+                        ? item.imagined_price.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                          })
+                        : '0,00'}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -251,22 +291,35 @@ export default function Inventory() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleOpenForm(item)}
-                        className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/10"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(item.id)}
-                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {!showDeleted ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleOpenForm(item)}
+                            className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/10"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(item.id)}
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRestore(item.id)}
+                          className="h-8 w-8 text-green-500 hover:text-green-600 hover:bg-green-500/10"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 )
@@ -274,7 +327,7 @@ export default function Inventory() {
               {filteredItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={7}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     Nenhum item encontrado.
@@ -284,11 +337,52 @@ export default function Inventory() {
             </tbody>
           </table>
         </div>
-
         <div className="text-sm text-muted-foreground pt-2">
-          Mostrando {filteredItems.length} de {items.length} itens
+          Mostrando {filteredItems.length} itens {showDeleted && '(Lixeira)'}
         </div>
       </div>
+
+      {/* Floating Bulk Actions Bar */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border shadow-2xl rounded-full px-6 py-3 flex items-center gap-4 z-50 animate-slide-up">
+          <span className="text-sm font-semibold">
+            {selectedIds.length} selecionados
+          </span>
+          <div className="w-px h-6 bg-border" />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleBulkAction('restore')}
+            className={showDeleted ? '' : 'hidden'}
+          >
+            Restaurar
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleBulkAction('available')}
+            className={!showDeleted ? '' : 'hidden'}
+          >
+            Disponível
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleBulkAction('urgent')}
+            className={!showDeleted ? '' : 'hidden'}
+          >
+            Urgente
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => handleBulkAction('delete')}
+            className={!showDeleted ? '' : 'hidden'}
+          >
+            Deletar
+          </Button>
+        </div>
+      )}
 
       <InventoryForm
         isOpen={isFormOpen}
@@ -296,7 +390,6 @@ export default function Inventory() {
         onSave={handleSaveForm}
         initialData={editingItem}
       />
-
       <BulkImportDialog
         isOpen={isBulkOpen}
         onClose={() => setIsBulkOpen(false)}

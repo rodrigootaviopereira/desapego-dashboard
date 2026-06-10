@@ -29,8 +29,12 @@ const navItems = [
   { icon: Megaphone, label: 'Anúncios', path: '/anuncios' },
   { icon: Lightbulb, label: 'Dicas', path: '/dicas' },
   { icon: ArrowRightLeft, label: 'Fluxo', path: '/fluxo' },
+  { icon: ScrollText, label: 'Relatórios', path: '/relatorios' },
   { icon: ScrollText, label: 'Logs', path: '/logs' },
   { icon: Settings, label: 'Configuração', path: '/configuracao' },
+  { icon: Settings, label: 'API Admin', path: '/admin/api' },
+  { icon: Settings, label: 'Webhooks', path: '/admin/webhooks' },
+  { icon: Settings, label: 'API Docs', path: '/api/docs' },
 ]
 
 export default function Layout() {

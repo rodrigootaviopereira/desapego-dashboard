@@ -27,6 +27,7 @@ export interface InventoryItem {
   doacao_data?: string
   donatario_nome?: string
   local_doacao?: string
+  deletado?: boolean
 }
 
 export const getInventoryItems = async () => {
