@@ -4,6 +4,9 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -24,10 +27,6 @@ jobs:
       - name: Build static export
         run: npm run build
 
-      # A pasta out/ contém o site pronto para publicar.
-      # Habilite a opção que o Skip Cloud suportar:
-
-      # OPÇÃO A — GitHub Pages (mais simples, repo precisa ser público)
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
