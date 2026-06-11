@@ -8,6 +8,7 @@ import { KpiCards } from "@/components/KpiCards";
 import FilterBar from "@/components/FilterBar";
 import ItemCard from "@/components/ItemCard";
 import { SoldModal, DonateModal } from "@/components/ActionModal";
+import * as skipAPI from "@/lib/skip-browser";
 
 interface PBResponse {
   items: InventoryItem[];
@@ -41,12 +42,10 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams();
-      if (status !== "all") params.set("status", status);
-      if (category !== "all") params.set("category", category);
-      const res = await fetch(`/api/items?${params}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: PBResponse = await res.json();
+      const filters: string[] = ["deletado=false"];
+      if (status !== "all") filters.push(`status="${status}"`);
+      if (category !== "all") filters.push(`category="${category}"`);
+      const data: PBResponse = await skipAPI.fetchItems(filters.join(" && "));
       setItems(data.items ?? []);
       setTotal(data.totalItems ?? 0);
     } catch (e: unknown) {
@@ -70,12 +69,7 @@ export default function Dashboard() {
     if (!modal || modal.type !== "sold") return;
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/items/${modal.item.id}/mark-sold`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ valor_final: valorFinal }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await skipAPI.markSold(modal.item.id, valorFinal);
       setItems((prev) =>
         prev.map((i) =>
           i.id === modal.item.id ? { ...i, status: "vendido" as ItemStatus } : i
@@ -94,15 +88,7 @@ export default function Dashboard() {
     setActionLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
-      const res = await fetch(`/api/items/${modal.item.id}/mark-donated`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          donation_recipient: recipient,
-          donation_date: today,
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await skipAPI.markDonated(modal.item.id, recipient, today);
       setItems((prev) =>
         prev.map((i) =>
           i.id === modal.item.id ? { ...i, status: "doado" as ItemStatus } : i
