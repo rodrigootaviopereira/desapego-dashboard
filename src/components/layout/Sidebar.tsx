@@ -27,7 +27,7 @@ export function Sidebar() {
     let active = true;
     async function check() {
       try {
-        const r = await fetch("https://pixel-implementation-clone-3c137.shrd00.internal.goskip.dev/api/collections/inventory_items/records?perPage=1");
+        const r = await fetch("https://desapego.goskip.app/api/collections/inventory_items/records?perPage=1");
         if (active) setStatus(r.ok ? "ok" : "error");
       } catch {
         if (active) setStatus("error");
