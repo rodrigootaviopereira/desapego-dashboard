@@ -1,0 +1,72 @@
+{
+  "plataformas": {
+    "olx": {
+      "nome": "OLX",
+      "url": "https://www.olx.com.br",
+      "taxa_percentual": 0,
+      "taxa_fixa": 0,
+      "alcance": "Alto",
+      "frete": "Opcional",
+      "nota": "Taxa em algumas categorias especiais. Verificar antes."
+    },
+    "mercado_livre": {
+      "nome": "Mercado Livre",
+      "url": "https://www.mercadolivre.com.br",
+      "taxa_percentual": 16,
+      "taxa_fixa": 0,
+      "alcance": "Muito Alto",
+      "frete": "Mercado Envios",
+      "nota": "Taxa varia por categoria (11–16%). Conta com mais vendas tem taxa menor."
+    },
+    "enjoei": {
+      "nome": "Enjoei",
+      "url": "https://www.enjoei.com.br",
+      "taxa_percentual": 20,
+      "taxa_fixa": 2,
+      "alcance": "Médio",
+      "frete": "Correios ou Enjoei",
+      "nota": "Taxa alta. Ideal para itens acima de R$ 50."
+    },
+    "facebook_marketplace": {
+      "nome": "Facebook Marketplace",
+      "url": "https://www.facebook.com/marketplace",
+      "taxa_percentual": 0,
+      "taxa_fixa": 0,
+      "alcance": "Alto (local)",
+      "frete": "Combinar",
+      "nota": "Grátis. Melhor para retirada local. Completar com grupos específicos."
+    },
+    "etsy": {
+      "nome": "Etsy",
+      "url": "https://www.etsy.com",
+      "taxa_percentual": 6.5,
+      "taxa_fixa": 0.2,
+      "alcance": "Global",
+      "frete": "Internacional",
+      "nota": "Para itens únicos/vintage com apelo internacional. Requer inglês."
+    },
+    "estante_virtual": {
+      "nome": "Estante Virtual",
+      "url": "https://www.estantevirtual.com.br",
+      "taxa_percentual": 15,
+      "taxa_fixa": 0,
+      "alcance": "Médio",
+      "frete": "Correios",
+      "nota": "Especializado em livros usados. Ótimo para acervo grande."
+    }
+  },
+  "categorias_por_plataforma": {
+    "Instrumentos": ["OLX", "Mercado Livre", "Facebook Marketplace"],
+    "Livros": ["Facebook Marketplace", "Enjoei", "Estante Virtual"],
+    "Gibis": ["Facebook Marketplace", "OLX", "Etsy"],
+    "Eletrônicos": ["Mercado Livre", "OLX", "Facebook Marketplace"],
+    "Outros": ["OLX", "Facebook Marketplace", "Enjoei"]
+  },
+  "doacao": [
+    { "nome": "Bibliotecas Públicas", "aceita": ["Livros", "Gibis"] },
+    { "nome": "Escolas Públicas", "aceita": ["Livros", "Gibis", "Eletrônicos"] },
+    { "nome": "Igrejas e Centros Comunitários", "aceita": ["Instrumentos", "Livros", "Eletrônicos", "Outros"] },
+    { "nome": "Instituto Reintegra / ONG de reaproveitamento tecnológico", "aceita": ["Eletrônicos"] },
+    { "nome": "Grupos Facebook 'Doe e Receba [cidade]'", "aceita": ["Todos"] }
+  ]
+}

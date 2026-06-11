@@ -1,0 +1,12 @@
+[
+  { "id": 1, "agente": "organizer", "tipo": "catalogacao", "texto": "Sempre preencher 'defeitos' mesmo que seja 'nenhum'. Transparência gera confiança nos compradores." },
+  { "id": 2, "agente": "copy-chief", "tipo": "foto", "texto": "Para eletrônicos: tirar foto ligado e funcionando. Prova que funciona e gera segurança." },
+  { "id": 3, "agente": "copy-chief", "tipo": "foto", "texto": "Para gibis/livros: foto da lombada lateral. Colecionadores checam numeração e edição por aí." },
+  { "id": 4, "agente": "market-strategist", "tipo": "preço", "texto": "Mercado Livre: referência de preço é crítica. Pesquise 'vendido recentemente' antes de fixar âncora." },
+  { "id": 5, "agente": "market-strategist", "tipo": "logistica", "texto": "Coleções de gibis: considerar vender como lote. Frete único reduz custo para cliente." },
+  { "id": 6, "agente": "desapego-chief", "tipo": "geral", "texto": "Score 8+: anunciar em até 3 dias. Score 5-7: segunda leva (14 dias). Score <5: doar ou guardar." },
+  { "id": 7, "agente": "organizer", "tipo": "catalogacao", "texto": "Para itens sem preço imaginado (0), pedir 'ref. mercado' nas observações. Evita surpresa na precificação." },
+  { "id": 8, "agente": "copy-chief", "tipo": "descricao", "texto": "Tom pessoal > tom de loja. 'Comprei, usei pouco' é melhor que 'qualidade premium importada'." },
+  { "id": 9, "agente": "market-strategist", "tipo": "plataforma", "texto": "Eletrônicos raros/coletor: Mercado Livre > OLX. Público é mais especializado e aceita preço maior." },
+  { "id": 10, "agente": "desapego-chief", "tipo": "geral", "texto": "Revisar e atualizar status depois de cada venda/doação. Manter inventário realista." }
+]
