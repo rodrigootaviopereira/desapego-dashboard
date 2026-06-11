@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T00:21:17.246Z",
+  "generatedAt": "2026-06-11T00:30:21.217Z",
   "collections": [
     {
       "name": "users",
@@ -48,11 +48,11 @@
       "name": "inventory_items",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != null || @request.auth.sub != null",
-        "view": "@request.auth.id != null || @request.auth.sub != null",
-        "create": "@request.auth.id != null || @request.auth.sub != null",
-        "update": "@request.auth.id != null || @request.auth.sub != null",
-        "delete": "@request.auth.id != null || @request.auth.sub != null"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {
@@ -244,11 +244,11 @@
       "name": "recomendacoes",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != null || @request.auth.sub != null",
-        "view": "@request.auth.id != null || @request.auth.sub != null",
-        "create": "@request.auth.id != null || @request.auth.sub != null",
-        "update": "@request.auth.id != null || @request.auth.sub != null",
-        "delete": "@request.auth.id != null || @request.auth.sub != null"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {
@@ -327,11 +327,11 @@
       "name": "prompts_venda",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != null || @request.auth.sub != null",
-        "view": "@request.auth.id != null || @request.auth.sub != null",
-        "create": "@request.auth.id != null || @request.auth.sub != null",
-        "update": "@request.auth.id != null || @request.auth.sub != null",
-        "delete": "@request.auth.id != null || @request.auth.sub != null"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {
@@ -411,11 +411,11 @@
       "name": "dicas",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != null || @request.auth.sub != null",
-        "view": "@request.auth.id != null || @request.auth.sub != null",
-        "create": "@request.auth.id != null || @request.auth.sub != null",
-        "update": "@request.auth.id != null || @request.auth.sub != null",
-        "delete": "@request.auth.id != null || @request.auth.sub != null"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {
@@ -483,11 +483,11 @@
       "name": "logs",
       "type": "base",
       "apiRules": {
-        "list": "@request.auth.id != null || @request.auth.sub != null",
-        "view": "@request.auth.id != null || @request.auth.sub != null",
-        "create": "@request.auth.id != null || @request.auth.sub != null",
-        "update": "@request.auth.id != null || @request.auth.sub != null",
-        "delete": "@request.auth.id != null || @request.auth.sub != null"
+        "list": "@request.auth.id != null",
+        "view": "@request.auth.id != null",
+        "create": "@request.auth.id != null",
+        "update": "@request.auth.id != null",
+        "delete": "@request.auth.id != null"
       },
       "fields": [
         {

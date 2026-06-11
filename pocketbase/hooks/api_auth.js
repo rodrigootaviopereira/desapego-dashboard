@@ -11,16 +11,15 @@ routerAdd('POST', '/backend/v1/api/auth/token', (e) => {
     ) {
       return e.unauthorizedError('Invalid credentials')
     }
-    const token = $security.createJWT(
-      { sub: keyRecord.getString('agent_name') },
-      'SUPER_SECRET_KEY_123',
-      86400,
-    )
-    return e.json(200, {
-      access_token: token,
-      token_type: 'Bearer',
-      expires_in: 86400,
-    })
+    const agentName = keyRecord.getString('agent_name').toLowerCase()
+    const email = `${agentName}@desapego.app`
+    let userRecord
+    try {
+      userRecord = $app.findAuthRecordByEmail('_pb_users_auth_', email)
+    } catch (err) {
+      return e.unauthorizedError('Agent user not found')
+    }
+    return $apis.recordAuthResponse(e, userRecord)
   } catch (err) {
     return e.unauthorizedError('Invalid credentials')
   }
