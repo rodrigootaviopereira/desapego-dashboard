@@ -10,11 +10,7 @@ export interface OpenAIChatResult {
     message: { role: string; content: string; tool_calls?: unknown[] }
     finish_reason: string
   }>
-  usage?: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
-  }
+  usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number }
 }
 
 export interface AgentCitation {
@@ -124,8 +120,7 @@ function parseSseBlock(raw: string): SseBlock | null {
     const line = rawLine.replace(/\r$/, '')
     if (!line || line.startsWith(':')) continue
     if (line.startsWith('event:')) event = line.slice(6).trim()
-    else if (line.startsWith('data:'))
-      dataLines.push(line.slice(5).replace(/^ /, ''))
+    else if (line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /, ''))
   }
   if (dataLines.length === 0) return null
   return { event, data: dataLines.join('\n') }
@@ -159,8 +154,7 @@ export function displayableMessages(
     .filter((m) => {
       if (opts.includeToolTrail) return m.role !== undefined
       if (m.role === 'user') return true
-      if (m.role === 'assistant')
-        return typeof m.content === 'string' && m.content.length > 0
+      if (m.role === 'assistant') return typeof m.content === 'string' && m.content.length > 0
       return false
     })
     .map((m) => ({
@@ -179,9 +173,7 @@ function isOpenAIChatStreamChunk(v: unknown): v is OpenAIChatStreamChunk {
   return c.every((choice) => {
     if (!choice || typeof choice !== 'object') return false
     const ch = choice as Record<string, unknown>
-    return (
-      typeof ch.index === 'number' && !!ch.delta && typeof ch.delta === 'object'
-    )
+    return typeof ch.index === 'number' && !!ch.delta && typeof ch.delta === 'object'
   })
 }
 
@@ -222,8 +214,7 @@ export async function* parseAgentChatStream(
     switch (block.event) {
       case 'chunk': {
         const v = parsed as { content?: unknown }
-        if (typeof v?.content === 'string')
-          yield { type: 'chunk', content: v.content }
+        if (typeof v?.content === 'string') yield { type: 'chunk', content: v.content }
         break
       }
       case 'tool_call_start': {
@@ -247,15 +238,8 @@ export async function* parseAgentChatStream(
       }
       case 'done': {
         const v = parsed as { conversation_id?: unknown; message_id?: unknown }
-        if (
-          typeof v?.conversation_id === 'string' &&
-          typeof v?.message_id === 'string'
-        ) {
-          yield {
-            type: 'done',
-            conversation_id: v.conversation_id,
-            message_id: v.message_id,
-          }
+        if (typeof v?.conversation_id === 'string' && typeof v?.message_id === 'string') {
+          yield { type: 'done', conversation_id: v.conversation_id, message_id: v.message_id }
         }
         break
       }
@@ -298,10 +282,7 @@ export async function streamAgentChat(
   if (!response.ok) {
     let message = `Agent chat failed: ${response.status}`
     try {
-      const body = (await response.clone().json()) as {
-        message?: unknown
-        error?: unknown
-      }
+      const body = (await response.clone().json()) as { message?: unknown; error?: unknown }
       if (typeof body.message === 'string') message = body.message
       else if (typeof body.error === 'string') message = body.error
     } catch {
@@ -369,11 +350,5 @@ export async function streamAgentChat(
     throw new Error('Agent stream ended before the done event')
   }
 
-  return {
-    content,
-    conversation_id: conversationId,
-    message_id: messageId,
-    citations,
-    toolCalls,
-  }
+  return { content, conversation_id: conversationId, message_id: messageId, citations, toolCalls }
 }
