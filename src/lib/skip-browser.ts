@@ -1,5 +1,5 @@
-const BACKEND_URL = "https://desapego.goskip.app/backend";
-const POCKETBASE_URL = "https://desapego.goskip.app/api";
+const BACKEND_URL = "https://pixel-implementation-clone-3c137.shrd00.internal.goskip.dev";
+const POCKETBASE_URL = "https://pixel-implementation-clone-3c137.shrd00.internal.goskip.dev/api";
 const CLIENT_ID = "RfMFWJuWFtKpueUG";
 const CLIENT_SECRET = "56hk9MHxTgInKAohIhrEEjgHZwkQSwJ7";
 
